@@ -5,7 +5,8 @@ on:
     - cron:  '0 0 * * *'
     # scheduled at 07:00 every Monday and Thursday
 
-  workflow_dispatch:  # click the button on Github repo!
+  # workflow_dispatch:
+  # click the button on Github repo!
 
 jobs:
   sync_latest_from_upstream:
