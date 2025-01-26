@@ -226,7 +226,7 @@ EOL;
                     </form>
                 </div>
                 <div class="col-auto">
-                    <button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#cronModal">
+                    <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#cronModal">
                         <i class="bi bi-clock"></i> 设置定时任务
                     </button>
                 </div>
@@ -410,7 +410,7 @@ EOL;
             echo "<div class='text-center' mb-3>";
             echo "<button class='btn btn-info me-3' type='button' onclick='copyToClipboard()'><i class='bi bi-clipboard'></i> 复制到剪贴</button>";
             echo "<input type='hidden' name='saveContent' value='1'>";
-            echo "<button class='btn btn-success' type='submit'><i class='bi bi-save'></i>保存修改</button>";
+            echo "<button class='btn btn-success' type='submit'><i class='bi bi-save'></i> 保存修改</button>";
             echo "</div>";
             echo "</form>";
             echo "</div>";

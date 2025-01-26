@@ -20,8 +20,8 @@ if(isset($_POST['fw'])){
     if ($dt == 'disable') shell_exec("uci set neko.cfg.new_interface='0' && uci commit neko");
 }
 $fwstatus=shell_exec("uci get neko.cfg.new_interface");
+$enableSnow = false;
 ?>
-
 <?php
 function getSingboxVersion() {
     $singBoxPath = '/usr/bin/sing-box'; 
@@ -169,6 +169,8 @@ $razordVersion = getRazordVersion();
     <link href="./assets/theme/<?php echo $neko_theme ?>" rel="stylesheet">
     <link href="./assets/css/custom.css" rel="stylesheet">
     <link href="./assets/bootstrap/bootstrap-icons.css" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css?v=<?php echo time(); ?>" />
+    <script src="script.js?v=<?php echo time(); ?>"></script>
     <script type="text/javascript" src="./assets/js/bootstrap.min.js"></script>
     <script type="text/javascript" src="./assets/js/feather.min.js"></script>
     <script type="text/javascript" src="./assets/bootstrap/bootstrap.bundle.min.js"></script>
@@ -221,14 +223,16 @@ $razordVersion = getRazordVersion();
             </div>
             <div class="col-12 col-md-6 mb-3" style="padding-right: 1.3rem;" >
                 <div class="d-flex justify-content-between gap-2">
-                    <input class="btn btn-info btn-custom" type="submit" value="🖫 更改主题">
+                    <button class="btn btn-info btn-custom" type="submit">
+                        <i class="bi bi-paint-bucket"></i> 更改主题
+                    </button>
                     
                     <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#colorModal">
-                        主题编辑器
+                        <i class="bi-palette"></i> 主题编辑器
                     </button>
                     
                     <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#filesModal">
-                        上传并管理背景图片
+                        <i class="bi-upload"></i> 上传并管理背景图片
                     </button>
                 </div>
             </div>
@@ -624,70 +628,111 @@ $razordVersion = getRazordVersion();
         <form method="POST" action="theme.php" id="themeForm" enctype="multipart/form-data">
           <div class="row">
             <div class="col-md-6 mb-3">
-              <label for="primaryColor" class="form-label">主色</label>
-              <input type="color" class="form-control" name="primaryColor" id="primaryColor" value="#ffcc00">
+              <label for="primaryColor" class="form-label">导航栏文本色</label>
+              <input type="color" class="form-control" name="primaryColor" id="primaryColor" value="#0ceda2">
             </div>
             <div class="col-md-6 mb-3">
-              <label for="secondaryColor" class="form-label">副色</label>
+              <label for="secondaryColor" class="form-label">导航栏悬停文本色</label>
               <input type="color" class="form-control" name="secondaryColor" id="secondaryColor" value="#00ffff">
             </div>
             <div class="col-md-6 mb-3">
               <label for="bodyBgColor" class="form-label">主背景色</label>
-              <input type="color" class="form-control" name="bodyBgColor" id="bodyBgColor" value="#087990">
+              <input type="color" class="form-control" name="bodyBgColor" id="bodyBgColor" value="#23407e">
             </div>
             <div class="col-md-6 mb-3">
               <label for="infoBgSubtle" class="form-label">信息背景色</label>
-              <input type="color" class="form-control" name="infoBgSubtle" id="infoBgSubtle" value="#6a5acd">
+              <input type="color" class="form-control" name="infoBgSubtle" id="infoBgSubtle" value="#23407e">
             </div>
             <div class="col-md-6 mb-3">
-              <label for="primaryBorderSubtle" class="form-label">主边框颜色</label>
-              <input type="color" class="form-control" name="primaryBorderSubtle" id="primaryBorderSubtle" value="#87ceeb">
+              <label for="backgroundColor" class="form-label">表格背景色</label>
+              <input type="color" class="form-control" name="backgroundColor" id="backgroundColor" value="#20cdd9">
             </div>
             <div class="col-md-6 mb-3">
-              <label for="bodyColor" class="form-label">文本颜色 1</label>
-              <input type="color" class="form-control" name="bodyColor" id="bodyColor" value="#ffff00">
+              <label for="primaryBorderSubtle" class="form-label">表格文本色</label>
+              <input type="color" class="form-control" name="primaryBorderSubtle" id="primaryBorderSubtle" value="#1815d1">
             </div>
             <div class="col-md-6 mb-3">
-              <label for="tertiaryColor" class="form-label">文本颜色 2</label>
-              <input type="color" class="form-control" name="tertiaryColor" id="tertiaryColor" value="#00ff00">
+              <label for="placeholderColor" class="form-label">输入框文本色</label>
+              <input type="color" class="form-control" name="placeholderColor" id="placeholderColor" value="#f82af2">
             </div>
             <div class="col-md-6 mb-3">
-              <label for="tertiaryRgbColor" class="form-label">文本颜色 3</label>
+              <label for="logTextColor" class="form-label">日志文本色</label>
+              <input type="color" class="form-control" name="logTextColor" id="logTextColor" value="#f8f9fa">
+            </div>
+            <div class="col-md-6 mb-3">
+              <label for="selectColor" class="form-label">主边框背景色</label>
+              <input type="color" class="form-control" name="selectColor" id="selectColor" value="#23407e">
+            </div>
+            <div class="col-md-6 mb-3">
+              <label for="bodyColor" class="form-label">表格文本色 1</label>
+              <input type="color" class="form-control" name="bodyColor" id="bodyColor" value="#04f153">
+            </div>
+            <div class="col-md-6 mb-3">
+              <label for="tertiaryColor" class="form-label">表格文本色 2</label>
+              <input type="color" class="form-control" name="tertiaryColor" id="tertiaryColor" value="#46e1ec">
+            </div>
+            <div class="col-md-6 mb-3">
+              <label for="tertiaryRgbColor" class="form-label">表格文本色 3</label>
               <input type="color" class="form-control" name="tertiaryRgbColor" id="tertiaryRgbColor" value="#1e90ff">
             </div>
             <div class="col-md-6 mb-3">
-              <label for="heading1Color" class="form-label">标题颜色 1</label>
-              <input type="color" class="form-control" name="heading1Color" id="heading1Color" value="#00a2e8">
+              <label for="outlineColor" class="form-label">按键色（青色）</label>
+              <input type="color" class="form-control" name="outlineColor" id="outlineColor" value="#0dcaf0">
             </div>
             <div class="col-md-6 mb-3">
-              <label for="heading2Color" class="form-label">标题颜色 2</label>
-              <input type="color" class="form-control" name="heading2Color" id="heading2Color" value="#00a2e8">
+              <label for="successColor" class="form-label">按键色（绿色）</label>
+              <input type="color" class="form-control" name="successColor" id="successColor" value="#28a745">
             </div>
             <div class="col-md-6 mb-3">
-              <label for="heading3Color" class="form-label">标题颜色 3</label>
+              <label for="infoColor" class="form-label">按键色（蓝色）</label>
+              <input type="color" class="form-control" name="infoColor" id="infoColor" value="#0ca2ed">
+            </div>
+            <div class="col-md-6 mb-3">
+              <label for="warningColor" class="form-label">按键色（黄色）</label>
+              <input type="color" class="form-control" name="warningColor" id="warningColor" value="#ffc107">
+            </div>
+            <div class="col-md-6 mb-3">
+              <label for="pinkColor" class="form-label">按键色（粉红色）</label>
+              <input type="color" class="form-control" name="pinkColor" id="pinkColor" value="#f82af2">
+            </div>
+            <div class="col-md-6 mb-3">
+              <label for="dangerColor" class="form-label">按键色（红色）</label>
+              <input type="color" class="form-control" name="dangerColor" id="dangerColor" value="#dc3545">
+            </div>
+            <div class="col-md-6 mb-3">
+              <label for="heading1Color" class="form-label">标题色 1</label>
+              <input type="color" class="form-control" name="heading1Color" id="heading1Color" value="#21e4f2">
+            </div>
+            <div class="col-md-6 mb-3">
+              <label for="heading2Color" class="form-label">标题色 2</label>
+              <input type="color" class="form-control" name="heading2Color" id="heading2Color" value="#65f1fb">
+            </div>
+            <div class="col-md-6 mb-3">
+              <label for="heading3Color" class="form-label">标题色 3</label>
               <input type="color" class="form-control" name="heading3Color" id="heading3Color" value="#ffcc00">
             </div>
             <div class="col-md-6 mb-3">
-              <label for="heading4Color" class="form-label">标题颜色 4</label>
-              <input type="color" class="form-control" name="heading4Color" id="heading4Color" value="#ff4500">
+              <label for="heading4Color" class="form-label">标题色 4</label>
+              <input type="color" class="form-control" name="heading4Color" id="heading4Color" value="#00fbff">
             </div>
             <div class="col-md-6 mb-3">
-              <label for="heading5Color" class="form-label">标题颜色 5</label>
-              <input type="color" class="form-control" name="heading5Color" id="heading5Color" value="#7d5fff">
+              <label for="heading5Color" class="form-label">标题色 5</label>
+              <input type="color" class="form-control" name="heading5Color" id="heading5Color" value="#ba13f6">
             </div>
             <div class="col-md-6 mb-3">
-              <label for="heading6Color" class="form-label">标题颜色 6</label>
+              <label for="heading6Color" class="form-label">标题色 6</label>
               <input type="color" class="form-control" name="heading6Color" id="heading6Color" value="#00ffff">
             </div>
           </div>
-
+            <div class="mb-3 form-check">
+              <input type="checkbox" class="form-check-input" id="enableSnowEffect" name="enableSnowEffect" <?php echo $enableSnow ? 'checked' : ''; ?>>
+              <label class="form-check-label" for="enableSnowEffect">启用雪花动画（要禁用重复勾选2次）</label>
+          </div>
           <div class="mb-3 form-check">
             <input type="checkbox" class="form-check-input" id="useBackgroundImage" name="useBackgroundImage">
             <label class="form-check-label" for="useBackgroundImage">使用自定义背景图片</label>
           </div>
-
           <div class="mb-3" id="backgroundImageContainer" style="display:none; position: relative; left: -1ch;">
-            <label for="backgroundImage" class="form-label">选择背景图片</label>
             <select class="form-select" id="backgroundImage" name="backgroundImage">
               <option value="">请选择图片</option>
               <?php
@@ -701,12 +746,14 @@ $razordVersion = getRazordVersion();
               ?>
             </select>
           </div>
-
-          <button type="submit" class="btn btn-primary  mb-3 me-2">保存主题</button>
-          <button type="button" class="btn btn-success  mb-3 me-2" id="resetButton">恢复默认值</button>
-          <button type="button" class="btn btn-info mb-3" id="exportButton">导出设置</button>
-          <input type="file" id="importButton" class="form-control mb-3" accept="application/json">
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+      <div class="d-flex flex-wrap justify-content-center align-items-center mb-3 gap-2">
+          <button type="submit" class="btn btn-primary">保存主题</button>
+          <button type="button" class="btn btn-success" id="resetButton">恢复默认值</button>
+          <button type="button" class="btn btn-info" id="exportButton">立即备份</button>
+          <button type="button" class="btn btn-warning" id="restoreButton">恢复备份</button> 
+          <input type="file" id="importButton" class="form-control" accept="application/json" style="display: none;"> 
+          <button type="button" class="btn btn-pink" data-bs-dismiss="modal">取消</button>
+      </div>
         </form>
       </div>
     </div>
@@ -718,6 +765,66 @@ $razordVersion = getRazordVersion();
         const container = document.getElementById('backgroundImageContainer');
         container.style.display = this.checked ? 'block' : 'none';
     });
+</script>
+
+<script>
+    document.getElementById('restoreButton').addEventListener('click', () => {
+        document.getElementById('importButton').click();
+    });
+
+    document.getElementById('importButton').addEventListener('change', (event) => {
+        const file = event.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                const content = e.target.result;
+                try {
+                    const jsonData = JSON.parse(content); 
+                    console.log('恢复的备份数据:', jsonData);
+                    alert('备份已成功上传并解析！');
+                } catch (error) {
+                    alert('文件格式错误，请上传正确的 JSON 文件！');
+                }
+            };
+            reader.readAsText(file);
+        }
+    });
+</script>
+
+<script>
+const tooltip = document.createElement('div');
+tooltip.style.position = 'fixed';
+tooltip.style.top = '10px';
+tooltip.style.left = '10px';
+tooltip.style.backgroundColor = 'rgba(0, 128, 0, 0.7)';  
+tooltip.style.color = 'white';
+tooltip.style.padding = '10px';
+tooltip.style.borderRadius = '5px';
+tooltip.style.zIndex = '9999';
+tooltip.style.display = 'none';  
+document.body.appendChild(tooltip);
+
+function showTooltip(message) {
+    tooltip.textContent = message;
+    tooltip.style.display = 'block'; 
+    setTimeout(() => {
+        tooltip.style.display = 'none';  
+    }, 5000);  
+}
+
+window.onload = function() {
+    showTooltip('双击左键打开播放器，F8键开启网站连通性检测');
+};
+</script>
+
+<script>
+document.getElementById('enableSnowEffect').addEventListener('change', function() {
+    var isChecked = this.checked;
+    var xhr = new XMLHttpRequest();
+    xhr.open('POST', 'save_snow_status.php', true);
+    xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+    xhr.send('enableSnowEffect=' + (isChecked ? '1' : '0'));
+});
 </script>
 
 <div class="modal fade" id="filesModal" tabindex="-1" aria-labelledby="filesModalLabel" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
@@ -840,20 +947,30 @@ function formatSize($size) {
     });
 
     document.getElementById('resetButton').addEventListener('click', function() {
-      document.getElementById('primaryColor').value = '#ffcc00';
+      document.getElementById('primaryColor').value = '#0ceda2';
       document.getElementById('secondaryColor').value = '#00ffff';
-      document.getElementById('bodyBgColor').value = '#087990';
-      document.getElementById('bodyColor').value = '#ffff00';
-      document.getElementById('infoBgSubtle').value = '#6a5acd';
-      document.getElementById('primaryBorderSubtle').value = '#87ceeb';
-      document.getElementById('tertiaryColor').value = '#00ff00';
+      document.getElementById('bodyBgColor').value = '#23407e';
+      document.getElementById('bodyColor').value = '#04f153';
+      document.getElementById('infoBgSubtle').value = '#23407e';
+      document.getElementById('selectColor').value = '#23407e';
+      document.getElementById('tertiaryColor').value = '#46e1ec';
       document.getElementById('tertiaryRgbColor').value = '#1e90ff';
-      document.getElementById('heading1Color').value = '#00a2e8';
-      document.getElementById('heading2Color').value = '#00a2e8';
+      document.getElementById('heading1Color').value = '#21e4f2';
+      document.getElementById('heading2Color').value = '#65f1fb';
       document.getElementById('heading3Color').value = '#ffcc00';
-      document.getElementById('heading4Color').value = '#ff4500';
-      document.getElementById('heading5Color').value = '#7d5fff';
+      document.getElementById('heading4Color').value = '#00fbff';
+      document.getElementById('heading5Color').value = '#ba13f6';
       document.getElementById('heading6Color').value = '#00ffff';
+      document.getElementById('primaryBorderSubtle').value = '#1815d1';
+      document.getElementById('backgroundColor').value = '#20cdd9';
+      document.getElementById('placeholderColor').value = '#f82af2';
+      document.getElementById('logTextColor').value = '#f8f9fa';
+      document.getElementById('outlineColor').value = '#0dcaf0';
+      document.getElementById('successColor').value = '#28a745';
+      document.getElementById('infoColor').value = '#0ca2ed';
+      document.getElementById('warningColor').value = '#ffc107';
+      document.getElementById('pinkColor').value = '#f82af2';
+      document.getElementById('dangerColor').value = '#dc3545';
       
       localStorage.clear();
     });
@@ -864,7 +981,7 @@ function formatSize($size) {
         secondaryColor: document.getElementById('secondaryColor').value,
         bodyBgColor: document.getElementById('bodyBgColor').value,
         infoBgSubtle: document.getElementById('infoBgSubtle').value,
-        primaryBorderSubtle: document.getElementById('primaryBorderSubtle').value,
+        selectColor: document.getElementById('selectColor').value,
         bodyColor: document.getElementById('bodyColor').value,
         tertiaryColor: document.getElementById('tertiaryColor').value,
         tertiaryRgbColor: document.getElementById('tertiaryRgbColor').value,
@@ -874,6 +991,17 @@ function formatSize($size) {
         heading4Color: document.getElementById('heading4Color').value,
         heading5Color: document.getElementById('heading5Color').value,
         heading6Color: document.getElementById('heading6Color').value,
+
+        outlineColor: document.getElementById('outlineColor').value,
+        successColor: document.getElementById('successColor').value,
+        infoColor: document.getElementById('infoColor').value,
+        warningColor: document.getElementById('warningColor').value,
+        pinkColor: document.getElementById('pinkColor').value,
+        dangerColor: document.getElementById('dangerColor').value,
+        primaryBorderSubtle: document.getElementById('primaryBorderSubtle').value,
+        backgroundColor: document.getElementById('backgroundColor').value,
+        placeholderColor: document.getElementById('placeholderColor').value,
+        logTextColor: document.getElementById('logTextColor').value,
         useBackgroundImage: document.getElementById('useBackgroundImage').checked,
         backgroundImage: document.getElementById('backgroundImage').value
       };
@@ -896,7 +1024,7 @@ function formatSize($size) {
           document.getElementById('secondaryColor').value = settings.secondaryColor;
           document.getElementById('bodyBgColor').value = settings.bodyBgColor;
           document.getElementById('infoBgSubtle').value = settings.infoBgSubtle;
-          document.getElementById('primaryBorderSubtle').value = settings.primaryBorderSubtle;
+          document.getElementById('selectColor').value = settings.selectColor;
           document.getElementById('bodyColor').value = settings.bodyColor;
           document.getElementById('tertiaryColor').value = settings.tertiaryColor;
           document.getElementById('tertiaryRgbColor').value = settings.tertiaryRgbColor;
@@ -906,6 +1034,16 @@ function formatSize($size) {
           document.getElementById('heading4Color').value = settings.heading4Color;
           document.getElementById('heading5Color').value = settings.heading5Color;
           document.getElementById('heading6Color').value = settings.heading6Color;
+          document.getElementById('outlineColor').value = settings.outlineColor;
+          document.getElementById('successColor').value = settings.successColor;
+          document.getElementById('infoColor').value = settings.infoColor;
+          document.getElementById('warningColor').value = settings.warningColor;
+          document.getElementById('pinkColor').value = settings.pinkColor;
+          document.getElementById('dangerColor').value = settings.dangerColor;
+          document.getElementById('primaryBorderSubtle').value = settings.primaryBorderSubtle;
+          document.getElementById('backgroundColor').value = settings.backgroundColor;
+          document.getElementById('placeholderColor').value = settings.placeholderColor;
+          document.getElementById('logTextColor').value = settings.logTextColor;
           document.getElementById('useBackgroundImage').checked = settings.useBackgroundImage;
 
           const backgroundImageContainer = document.getElementById('backgroundImageContainer');
@@ -916,7 +1054,7 @@ function formatSize($size) {
           localStorage.setItem('secondaryColor', settings.secondaryColor);
           localStorage.setItem('bodyBgColor', settings.bodyBgColor);
           localStorage.setItem('infoBgSubtle', settings.infoBgSubtle);
-          localStorage.setItem('primaryBorderSubtle', settings.primaryBorderSubtle);
+          localStorage.setItem('selectColor', settings.selectColor);
           localStorage.setItem('bodyColor', settings.bodyColor);
           localStorage.setItem('tertiaryColor', settings.tertiaryColor);
           localStorage.setItem('tertiaryRgbColor', settings.tertiaryRgbColor);
@@ -926,6 +1064,17 @@ function formatSize($size) {
           localStorage.setItem('heading4Color', settings.heading4Color);
           localStorage.setItem('heading5Color', settings.heading5Color);
           localStorage.setItem('heading6Color', settings.heading6Color);
+
+          localStorage.setItem('outlineColor', settings.outlineColor);
+          localStorage.setItem('successColor', settings.successColor);
+          localStorage.setItem('infoColor', settings.infoColor);
+          localStorage.setItem('warningColor', settings.warningColor);
+          localStorage.setItem('pinkColor', settings.pinkColor);
+          localStorage.setItem('dangerColor', settings.dangerColor);
+          localStorage.setItem('primaryBorderSubtle', settings.primaryBorderSubtle);
+          localStorage.setItem('backgroundColor', settings.backgroundColor);
+          localStorage.setItem('placeholderColor', settings.placeholderColor);
+          localStorage.setItem('logTextColor', settings.logTextColor);
           localStorage.setItem('useBackgroundImage', settings.useBackgroundImage);
           localStorage.setItem('backgroundImage', settings.backgroundImage);
         };
@@ -1175,11 +1324,11 @@ function selectOperation(type) {
                             ? '开始下载 Dashboard 面板更新...'  
                             : '未知面板更新类型...',
             description: selectedPanel === 'zashboard' 
-            ? '正在更新 Zashboard 面板到最新版本（dist-cdn-fonts.zip），如遇无法显示清除浏览器缓存。' 
+            ? '正在更新 Zashboard 面板到最新版本（dist-cdn-fonts.zip）' 
             : selectedPanel === 'Zashboard' 
-                ? '正在更新 Zashboard 面板到最新版本（dist.zip），如遇无法显示清除浏览器缓存。'  
+                ? '正在更新 Zashboard 面板到最新版本（dist.zip）'  
                 : selectedPanel === 'yacd-meat' 
-                    ? '正在更新 Yacd-Meat 面板到最新版本，如遇无法显示清除浏览器缓存。' 
+                    ? '正在更新 Yacd-Meat 面板到最新版本' 
                     : selectedPanel === 'metacubexd' 
                         ? '正在更新 Metacubexd 面板到最新版本' 
                         : selectedPanel === 'dashboard'  
@@ -1657,3 +1806,9 @@ document.getElementById('checkCliverButton').addEventListener('click', function 
     </div>
 </body>
 </html>
+
+
+
+
+
+
