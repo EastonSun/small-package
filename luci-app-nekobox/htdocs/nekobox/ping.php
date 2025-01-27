@@ -433,6 +433,13 @@ $lang = $_GET['lang'] ?? 'en';
     .exit-fullscreen-btn {
         display: none;
     }
+
+    #d-ip {
+        display: flex;
+        align-items: center;
+        gap: 5px;  
+        flex-wrap: nowrap;  
+    }
 </style>
 <link href="./assets/bootstrap/bootstrap-icons.css" rel="stylesheet">
 <script src="./assets/neko/js/jquery.min.js"></script>
@@ -732,21 +739,23 @@ let IP = {
                 displayASN = '';  
             }
 
-            let locationInfo = `<span style="margin-left: 8px;">${location} ${displayISP} ${data.asn || ''} ${displayASN}</span>`;
+            let locationInfo = `<span style="margin-left: 8px; position: relative; top: -4px;">${location} ${displayISP} ${data.asn || ''} ${displayASN}</span>`;
 
             const isHidden = localStorage.getItem("ipHidden") === "true";
 
             let simpleDisplay = `
-                <div style="display: flex; align-items: center; justify-content: flex-start; gap: 10px; padding-left: 5px; margin-bottom: 5px;">
-                    <div style="display: flex; align-items: center; gap: 5px;">
-                        <span id="ip-address">${isHidden ? '***.***.***.***.***' : cachedIP}</span> 
-                        <span class="badge badge-primary" style="color: #333;">${country}</span>
+                <div class="ip-main" style="cursor: pointer; position: relative; top: -4px;" onclick="IP.showDetailModal()" title="点击查看 IP 详细信息">
+                    <div style="display: flex; align-items: center; justify-content: flex-start; gap: 10px; ">
+                        <div style="display: flex; align-items: center; gap: 5px;">
+                            <span id="ip-address">${isHidden ? '***.***.***.***.***' : cachedIP}</span> 
+                            <span class="badge badge-primary" style="color: #333;">${country}</span>
+                        </div>
                     </div>
-
-                    <span id="toggle-ip" style="cursor: pointer;" title="点击隐藏/显示 IP">
-                        <i class="fa ${isHidden ? 'bi bi-eye-slash' : 'bi bi-eye'}"></i>  
-                    </span>
-                </div>`;
+                </div>
+                <span id="toggle-ip" style="cursor: pointer; position: relative; top: -3px;  text-indent: 1ch; padding-top: 2px;" title="点击隐藏/显示 IP">
+                    <i class="fa ${isHidden ? 'bi-eye-slash' : 'bi-eye'}"></i>  
+                </span>
+            `;
 
             document.getElementById('d-ip').innerHTML = simpleDisplay;
             document.getElementById('ipip').innerHTML = locationInfo;
@@ -761,13 +770,13 @@ let IP = {
 
                 if (ipElement.textContent === cachedIP) {
                     ipElement.textContent = '***.***.***.***.***';
-                    iconElement.classList.remove('bi bi-eye');
-                    iconElement.classList.add('bi bi-eye-slash');  
+                    iconElement.classList.remove('bi-eye');
+                    iconElement.classList.add('bi-eye-slash');  
                     localStorage.setItem("ipHidden", "true");  
                 } else {
                     ipElement.textContent = cachedIP;  
-                    iconElement.classList.remove('bi bi-eye-slash');
-                    iconElement.classList.add('bi bi-eye');  
+                    iconElement.classList.remove('bi-eye-slash');
+                    iconElement.classList.add('bi-eye');  
                     localStorage.setItem("ipHidden", "false");  
                 }
             });
@@ -1285,7 +1294,7 @@ window.addEventListener('load', function() {
             if (isPlaying) {
                 audioPlayer.play();
             }
-        } else if (event.key === ' ') { 
+        } else if (event.key === 'F9') { 
             if (isPlaying) {
                 audioPlayer.pause();
                 isPlaying = false;
@@ -1399,10 +1408,17 @@ window.addEventListener('load', function() {
     }
 
     document.addEventListener('dblclick', function () {
-        if (!hasModalShown) {  
-            const modal = new bootstrap.Modal(document.getElementById('keyHelpModal'));
-            modal.show();
-            hasModalShown = true;  
+        const lastShownTime = localStorage.getItem('lastModalShownTime'); 
+        const currentTime = new Date().getTime(); 
+
+        if (!lastShownTime || (currentTime - lastShownTime) > 4 * 60 * 60 * 1000) { 
+            if (!hasModalShown) {  
+                const modal = new bootstrap.Modal(document.getElementById('keyHelpModal'));
+                modal.show();
+                hasModalShown = true;
+
+                localStorage.setItem('lastModalShownTime', currentTime);
+            }
         }
     });
 
@@ -1420,7 +1436,7 @@ window.addEventListener('load', function() {
             </div>
             <div class="modal-body">
                 <ul>
-                    <li><strong>空格键:</strong> 播放/暂停</li>
+                    <li><strong>F9键:</strong> 播放/暂停</li>
                     <li><strong>箭头上下键:</strong> 切换上一首/下一首</li>
                     <li><strong>箭头左右键:</strong> 快进/快退 10 秒</li>
                     <li><strong>ESC键:</strong> 恢复到第一首</li>
@@ -1504,8 +1520,6 @@ window.addEventListener('load', function() {
     });
 
 </script>
-
-
 
 
 
