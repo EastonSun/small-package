@@ -20,7 +20,6 @@ if(isset($_POST['fw'])){
     if ($dt == 'disable') shell_exec("uci set neko.cfg.new_interface='0' && uci commit neko");
 }
 $fwstatus=shell_exec("uci get neko.cfg.new_interface");
-$enableSnow = false;
 ?>
 <?php
 function getSingboxVersion() {
@@ -269,8 +268,8 @@ $razordVersion = getRazordVersion();
                 </tr>
                 <tr>
                     <td class="text-center">
-                        <button class="btn btn-pink me-1" id="checkCliverButton">🔍 检测版本</button>
-                        <button class="btn btn-info" id="updateButton" title="更新到最新版本" onclick="showVersionTypeModal()">🔄 更新版本</button>
+                        <button class="btn btn-pink me-1" id="checkCliverButton"><i class="bi bi-search"></i> 检测版本</button>
+                        <button class="btn btn-info" id="updateButton" title="更新到最新版本" onclick="showVersionTypeModal()"><i class="bi bi-arrow-repeat"></i> 更新版本</button>
                     </td>
                 </tr>
             </tbody>
@@ -291,8 +290,8 @@ $razordVersion = getRazordVersion();
                 </tr>
                 <tr>
                     <td class="text-center">
-                        <button class="btn btn-pink me-1" id="checkUiButton">🔍 检测版本</button>
-                        <button class="btn btn-info" id="updateUiButton" title="更新面板" onclick="showPanelSelector()">🔄 更新版本</button>
+                        <button class="btn btn-pink me-1" id="checkUiButton"><i class="bi bi-search"></i> 检测版本</button>
+                        <button class="btn btn-info" id="updateUiButton" title="更新面板" onclick="showPanelSelector()"><i class="bi bi-arrow-repeat"></i> 更新版本</button>
                     </td>
                 </tr>
             </tbody>
@@ -317,8 +316,8 @@ $razordVersion = getRazordVersion();
                 </tr>
                 <tr>
                     <td class="text-center">
-                        <button class="btn btn-pink me-1" id="checkSingboxButton">🔍 检测版本</button>
-                        <button class="btn btn-info" id="singboxOptionsButton" title="Singbox 相关操作">🔄 更新版本</button>
+                        <button class="btn btn-pink me-1" id="checkSingboxButton"><i class="bi bi-search"></i> 检测版本</button>
+                        <button class="btn btn-info" id="singboxOptionsButton" title="Singbox 相关操作"><i class="bi bi-arrow-repeat"></i> 更新版本</button>
                     </td>
                 </tr>
             </tbody>
@@ -339,8 +338,8 @@ $razordVersion = getRazordVersion();
                 </tr>
                 <tr>
                     <td class="text-center">
-                        <button class="btn btn-pink me-1" id="checkMihomoButton">🔍 检测版本</button>
-                        <button class="btn btn-info" id="updateCoreButton" title="更新 Mihomo 内核" onclick="showMihomoVersionSelector()">🔄 更新版本</button>
+                        <button class="btn btn-pink me-1" id="checkMihomoButton"><i class="bi bi-search"></i> 检测版本</button>
+                        <button class="btn btn-info" id="updateCoreButton" title="更新 Mihomo 内核" onclick="showMihomoVersionSelector()"><i class="bi bi-arrow-repeat"></i> 更新版本</button>
                     </td>
                 </tr>
             </tbody>
@@ -653,7 +652,23 @@ $razordVersion = getRazordVersion();
               <input type="color" class="form-control" name="primaryBorderSubtle" id="primaryBorderSubtle" value="#1815d1">
             </div>
             <div class="col-md-6 mb-3">
-              <label for="placeholderColor" class="form-label">输入框文本色</label>
+              <label for="checkColor" class="form-label">主标题文本色 1</label>
+              <input type="color" class="form-control" name="checkColor" id="checkColor" value="#0eaf3e">
+            </div>
+            <div class="col-md-6 mb-3">
+              <label for="labelColor" class="form-label">主标题文本色 2</label>
+              <input type="color" class="form-control" name="labelColor" id="labelColor" value="#0eaf3e">
+            </div>
+            <div class="col-md-6 mb-3">
+              <label for="lineColor" class="form-label">行数文本色</label>
+              <input type="color" class="form-control" name="lineColor" id="lineColor" value="#f515f9">
+            </div>
+            <div class="col-md-6 mb-3">
+              <label for="controlColor" class="form-label">输入框文本色 1</label>
+              <input type="color" class="form-control" name="controlColor" id="controlColor" value="#0eaf3e">
+            </div>
+            <div class="col-md-6 mb-3">
+              <label for="placeholderColor" class="form-label">输入框文本色 2</label>
               <input type="color" class="form-control" name="placeholderColor" id="placeholderColor" value="#f82af2">
             </div>
             <div class="col-md-6 mb-3">
@@ -725,10 +740,11 @@ $razordVersion = getRazordVersion();
               <input type="color" class="form-control" name="heading6Color" id="heading6Color" value="#00ffff">
             </div>
           </div>
-            <div class="mb-3 form-check">
-              <input type="checkbox" class="form-check-input" id="enableSnowEffect" name="enableSnowEffect" <?php echo $enableSnow ? 'checked' : ''; ?>>
-              <label class="form-check-label" for="enableSnowEffect">启用雪花动画（Ctrl + F6快捷键启用/禁用）</label>
+          <div class="col-12 mb-3">
+            <label for="themeName" class="form-label">自定义主题名称</label>
+            <input type="text" class="form-control" name="themeName" id="themeName" value="transparent">
           </div>
+
           <div class="mb-3 form-check">
             <input type="checkbox" class="form-check-input" id="useBackgroundImage" name="useBackgroundImage">
             <label class="form-check-label" for="useBackgroundImage">使用自定义背景图片</label>
@@ -749,7 +765,7 @@ $razordVersion = getRazordVersion();
           </div>
       <div class="d-flex flex-wrap justify-content-center align-items-center mb-3 gap-2">
           <button type="submit" class="btn btn-primary">保存主题</button>
-          <button type="button" class="btn btn-success" id="resetButton">恢复默认值</button>
+          <button type="button" class="btn btn-success" id="resetButton" onclick="clearCache()">恢复默认值</button>
           <button type="button" class="btn btn-info" id="exportButton">立即备份</button>
           <button type="button" class="btn btn-warning" id="restoreButton">恢复备份</button> 
           <input type="file" id="importButton" class="form-control" accept="application/json" style="display: none;"> 
@@ -793,6 +809,21 @@ $razordVersion = getRazordVersion();
 </script>
 
 <script>
+    function clearCache() {
+        location.reload(true);        
+        localStorage.clear();   
+        sessionStorage.clear(); 
+        sessionStorage.setItem('cacheCleared', 'true'); 
+    }
+
+    window.addEventListener('load', function() {
+        if (sessionStorage.getItem('cacheCleared') === 'true') {
+            sessionStorage.removeItem('cacheCleared'); 
+        }
+    });
+</script>
+
+<script>
     const tooltip = document.createElement('div');
     tooltip.style.position = 'fixed';
     tooltip.style.top = '10px';
@@ -824,51 +855,6 @@ $razordVersion = getRazordVersion();
             localStorage.setItem('lastTooltipShownTime', currentTime);
         }
     };
-</script>
-
-<script>
-document.getElementById('enableSnowEffect').addEventListener('change', function() {
-    toggleSnowEffect(this.checked);
-});
-
-
-document.addEventListener('keydown', function(event) {
-    if (event.ctrlKey && event.code === 'F6') {
-        var checkbox = document.getElementById('enableSnowEffect');
-        checkbox.checked = !checkbox.checked;  
-        toggleSnowEffect(checkbox.checked);
-
-        var message = checkbox.checked ? '已启用雪花效果' : '已禁用雪花效果';
-        showNotification(message);
-    }
-});
-
-function toggleSnowEffect(isChecked) {
-    var xhr = new XMLHttpRequest();
-    xhr.open('POST', 'save_snow_status.php', true);
-    xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
-    xhr.send('enableSnowEffect=' + (isChecked ? '1' : '0'));
-    var message = isChecked ? '已启用' : '已禁用';
-    console.log(message);
-    showNotification(message);
-}
-
-function showNotification(message) {
-    var notification = document.createElement('div');
-    notification.style.position = 'fixed';
-    notification.style.top = '10px';
-    notification.style.right = '30px';
-    notification.style.backgroundColor = '#4CAF50';
-    notification.style.color = '#fff';
-    notification.style.padding = '10px';
-    notification.style.borderRadius = '5px';
-    notification.style.zIndex = '9999';
-    notification.innerText = message;
-    document.body.appendChild(notification);
-    setTimeout(function() {
-        notification.style.display = 'none';
-    }, 5000); 
-}
 </script>
 
 <div class="modal fade" id="filesModal" tabindex="-1" aria-labelledby="filesModalLabel" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
@@ -998,6 +984,10 @@ function formatSize($size) {
       document.getElementById('infoBgSubtle').value = '#23407e';
       document.getElementById('selectColor').value = '#23407e';
       document.getElementById('tertiaryColor').value = '#46e1ec';
+      document.getElementById('controlColor').value = '#0eaf3e';
+      document.getElementById('checkColor').value = '#0eaf3e';
+      document.getElementById('labelColor').value = '#0eaf3e';
+      document.getElementById('lineColor').value = '#f515f9';
       document.getElementById('tertiaryRgbColor').value = '#1e90ff';
       document.getElementById('heading1Color').value = '#21e4f2';
       document.getElementById('heading2Color').value = '#65f1fb';
@@ -1029,6 +1019,10 @@ function formatSize($size) {
         bodyColor: document.getElementById('bodyColor').value,
         tertiaryColor: document.getElementById('tertiaryColor').value,
         tertiaryRgbColor: document.getElementById('tertiaryRgbColor').value,
+        controlColor: document.getElementById('controlColor').value,
+        checkColor: document.getElementById('checkColor').value,
+        labelColor: document.getElementById('labelColor').value,
+        lineColor: document.getElementById('lineColor').value,
         heading1Color: document.getElementById('heading1Color').value,
         heading2Color: document.getElementById('heading2Color').value,
         heading3Color: document.getElementById('heading3Color').value,
@@ -1072,6 +1066,10 @@ function formatSize($size) {
           document.getElementById('bodyColor').value = settings.bodyColor;
           document.getElementById('tertiaryColor').value = settings.tertiaryColor;
           document.getElementById('tertiaryRgbColor').value = settings.tertiaryRgbColor;
+          document.getElementById('controlColor').value = settings.controlColor;
+          document.getElementById('checkColor').value = settings.checkColor;
+          document.getElementById('labelColor').value = settings.labelColor;
+          document.getElementById('lineColor').value = settings.lineColor;
           document.getElementById('heading1Color').value = settings.heading1Color;
           document.getElementById('heading2Color').value = settings.heading2Color;
           document.getElementById('heading3Color').value = settings.heading3Color;
@@ -1102,6 +1100,10 @@ function formatSize($size) {
           localStorage.setItem('bodyColor', settings.bodyColor);
           localStorage.setItem('tertiaryColor', settings.tertiaryColor);
           localStorage.setItem('tertiaryRgbColor', settings.tertiaryRgbColor);
+          localStorage.setItem('controlColor', settings.controlColor);
+          localStorage.setItem('checkColor', settings.checkColor);
+          localStorage.setItem('labelColor', settings.labelColor);
+          localStorage.setItem('lineColor', settings.lineColor);
           localStorage.setItem('heading1Color', settings.heading1Color);
           localStorage.setItem('heading2Color', settings.heading2Color);
           localStorage.setItem('heading3Color', settings.heading3Color);

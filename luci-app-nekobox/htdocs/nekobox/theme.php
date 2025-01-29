@@ -24,6 +24,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $warningColor = $_POST['warningColor'] ?? '#ffc107'; 
     $pinkColor = $_POST['pinkColor'] ?? '#f82af2';
     $dangerColor = $_POST['dangerColor'] ?? '#dc3545';
+    $controlColor = $_POST['controlColor'] ?? '#0eaf3e';
+    $checkColor = $_POST['checkColor'] ?? '#0eaf3e';
+    $labelColor = $_POST['labelColor'] ?? '#0eaf3e';
+    $lineColor = $_POST['lineColor'] ?? '#f515f9';
+    $themeName = isset($_POST['themeName']) ? $_POST['themeName'] : 'transparent'; 
+    
+    $themeName = preg_replace('/[^a-zA-Z]/', '', $themeName); 
+    if (empty($themeName)) {
+        $themeName = 'transparent'; 
+    }
+    
+    $themeFileName = $themeName . '.css';
 
     $uploadedImagePath = '';
     if (isset($_FILES['imageFile']) && $_FILES['imageFile']['error'] === UPLOAD_ERR_OK) {
@@ -38,13 +50,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     $backgroundImagePath = $_POST['backgroundImage'] ?? '';
-    $enableSnowEffect = isset($_POST['enableSnowEffect']) ? true : false; 
     $cssContent = "
 
     @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;700&family=Noto+Serif+SC:wght@400;700&display=swap');
     @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&family=Roboto:wght@400;700&family=Cinzel+Decorative:wght@700;900&display=swap');
     
-    [data-bs-theme=transparent] {
+    [data-bs-theme='$themeName'] {
       color-scheme: dark;
       --bs-primary: $primaryColor; 
       --bs-secondary: $secondaryColor; 
@@ -58,6 +69,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       --bs-btn-warning-bg: $warningColor;
       --bs-btn-pink-bg: $pinkColor;
       --bs-btn-danger-bg: $dangerColor;
+      --bs-controlr-bg: $controlColor;
+      --bs-check-bg: $checkColor;
+      --bs-label-bg: $labelColor;
+      --bs-line-bg: $lineColor;
 
       --bs-primary-border-subtle: $primaryBorderSubtle; 
       --bs-tertiary: $tertiaryColor; 
@@ -77,10 +92,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       --bs-heading-font-weight: 700;
       --bs-heading-letter-spacing: 0.05em;
       --bs-heading-text-transform: uppercase;
-
-      --bs-shadow-light: 0 4px 8px rgba(255, 0, 124, 0.4);
-      --bs-shadow-medium: 0 8px 16px rgba(0, 255, 133, 0.3);
-      --bs-shadow-heavy: 0 12px 24px rgba(125, 95, 255, 0.5);
 
       --bs-btn-color: #fff;
       --bs-btn-hover-color: #fff;
@@ -118,7 +129,31 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     #lineColumnDisplay, #charCountDisplay {
-        color: white !important; 
+        color: var(--bs-line-bg) !important; 
+    }
+
+    .form-label {
+      color: var(--bs-check-bg)
+    }
+
+    .form-check-label {
+      color: var(--bs-check-bg)
+    }
+
+    label {
+      color: var(--bs-label-bg)
+    }
+
+    .form-control {
+      color: var(--bs-controlr-bg)
+    }
+
+    form .form-control {
+      color: var(--bs-controlr-bg) !important;  
+    }
+
+    .card .card-body pre {
+        color: var(--log-text-color) !important;
     }
 
     .close {
@@ -133,12 +168,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     .alert-info {
         color: #FF00FF; 
-    }
-
-    #plugin_log,
-    #bin_logs,
-    #singbox_log {
-        color: var(--log-text-color);
     }
 
     .detail-label {
@@ -291,7 +320,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     .container-bg {
       border-radius: 12px;
-      box-shadow: var(--bs-shadow-medium);
+      box-shadow: none;
       padding: 2rem;
       margin-top: 2rem;
       margin-bottom: 2rem;
@@ -310,6 +339,34 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       color: black !important; 
       background-color: transparent !important; 
       border: none !important; 
+    }
+
+    ::-webkit-scrollbar {
+      width: 8px; 
+      height: 8px;
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: rgba(0, 0, 0, 0.5); 
+      border-radius: 4px; 
+      transition: background 0.3s ease; 
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      background: rgba(0, 0, 0, 0.7); 
+    }
+
+    ::-webkit-scrollbar-track {
+      background: transparent; 
+    }
+
+    .scrollable-container {
+      overflow: hidden; 
+      position: relative; 
+    }
+
+    .scrollable-container:hover {
+      overflow: auto; 
     }
 
     button, .btn-warning, .btn-info, .card, .modal-content { transition: transform 0.2s ease, box-shadow 0.2s ease; }
@@ -338,7 +395,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     .container-sm.container-bg.callout a::after { content: ''; position: absolute; bottom: 0; left: 0; width: 100%; height: 2px; background-color: var(--bs-primary); transform: scaleX(0); transition: transform var(--bs-transition-speed); }
     .container-sm.container-bg.callout a:hover, .container-sm.container-bg.callout a:focus, .container-sm.container-bg.callout a.active { color: var(--bs-secondary); } .container-sm.container-bg.callout a:hover::after, .container-sm.container-bg.callout a:focus::after, .container-sm.container-bg.callout a.active::after { transform: scaleX(1); }
 
-    .royal-style { font-family: 'Cinzel Decorative', cursive; font-weight: 900; font-size: 80px; color: var(--bs-primary); text-shadow: 2px 2px 4px rgba(142, 68, 173, 0.7); letter-spacing: 4px; text-align: center; margin-top: 20px; }
+    .royal-style { font-family: 'Cinzel Decorative', cursive; font-weight: 900; font-size: 80px; letter-spacing: 4px; text-align: center; margin-top: 20px; }
     .royal-style:hover { transform: skew(-5deg); }
     @media (max-width: 991.98px) { .container-sm.container-bg.callout { flex-direction: column; align-items: center; } .container-sm.container-bg.callout a { margin: 0.5rem 0; } }
     h1 { color: var(--bs-heading-1); font-size: 2.5rem; }
@@ -352,7 +409,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     .text-3d:hover { transform: rotateY(15deg) rotateX(15deg); text-shadow: 3px 3px 1px rgba(0, 0, 0, 0.3), 4px 4px 2px rgba(0, 0, 0, 0.25), 5px 5px 3px rgba(0, 0, 0, 0.2); }
     .card { border-radius: 12px; overflow: hidden; box-shadow: var(--bs-shadow-medium); }
     .card-header { background-color: var(--bs-primary); color: #fff; }
-    .royal-style { font-family: 'Cinzel Decorative', cursive; font-weight: 900; font-size: 80px; color: var(--bs-primary); text-shadow: 2px 2px 4px rgba(142, 68, 173, 0.7), 0 0 20px rgba(142, 68, 173, 0.3); letter-spacing: 4px; text-align: center; margin-top: 20px; transition: all var(--   bs-transition-speed); }
+    .royal-style { font-family: 'Cinzel Decorative', cursive; font-weight: 900; font-size: 80px; letter-spacing: 4px; text-align: center; margin-top: 20px; transition: all var(--   bs-transition-speed); }
     .royal-style:hover { transform: skew(-5deg); text-shadow: 3px 3px 6px rgba(0,0,0,0.2); }
     @media (max-width: 991.98px) {
       .container-sm.container-bg.callout {
@@ -440,10 +497,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         font-family: 'Cinzel Decorative', cursive;
         font-weight: 900;
         font-size: 80px;
-        color: var(--bs-primary);
-        text-shadow: 
-            2px 2px 4px rgba(142, 68, 173, 0.7),
-            0 0 20px rgba(142, 68, 173, 0.3);
         letter-spacing: 4px;
         text-align: center;
         margin-top: 20px;
@@ -550,124 +603,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
     ";
 
-    if ($enableSnowEffect) {
-        $snowEffectCSS = "
-    #snow-container {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        pointer-events: none;
-        z-index: 9999;
-        display: block;
-    }
-
-    .snowflake {
-        position: absolute;
-        top: -10px;  
-        width: 10px;
-        height: 10px;
-        background-color: white;
-        border-radius: 50%;
-        animation: fall linear infinite;  
-    }
-
-    @keyframes fall {
-        0% {
-            transform: translateY(0) rotate(0deg); 
-        }
-        100% {
-            transform: translateY(100vh) rotate(360deg); 
-        }
-    }
-
-    .snowflake:nth-child(1) {
-        animation-duration: 8s;
-        animation-delay: -2s;
-        left: 10%;
-        width: 12px;
-        height: 12px;
-    }
-
-    .snowflake:nth-child(2) {
-        animation-duration: 10s;
-        animation-delay: -3s;
-        left: 20%;
-        width: 8px;
-        height: 8px;
-    }
-
-    .snowflake:nth-child(3) {
-        animation-duration: 12s;
-        animation-delay: -1s;
-        left: 30%;
-        width: 15px;
-        height: 15px;
-    }
-
-    .snowflake:nth-child(4) {
-        animation-duration: 9s;
-        animation-delay: -5s;
-        left: 40%;
-        width: 10px;
-        height: 10px;
-    }
-
-    .snowflake:nth-child(5) {
-        animation-duration: 11s;
-        animation-delay: -4s;
-        left: 50%;
-        width: 14px;
-        height: 14px;
-    }
-
-    .snowflake:nth-child(6) {
-        animation-duration: 7s;
-        animation-delay: -6s;
-        left: 60%;
-        width: 9px;
-        height: 9px;
-    }
-
-    .snowflake:nth-child(7) {
-        animation-duration: 8s;
-        animation-delay: -7s;
-        left: 70%;
-        width: 11px;
-        height: 11px;
-    }
-
-    .snowflake:nth-child(8) {
-        animation-duration: 10s;
-        animation-delay: -8s;
-        left: 80%;
-        width: 13px;
-        height: 13px;
-    }
-
-    .snowflake:nth-child(9) {
-        animation-duration: 6s;
-        animation-delay: -9s;
-        left: 90%;
-        width: 10px;
-        height: 10px;
-    }
-        ";
-        $pos = strpos($cssContent, "#plugin_log, #bin_logs, #singbox_log") + strlen("#plugin_log, #bin_logs, #singbox_log {");
-        $endPos = strpos($cssContent, "}", $pos);
-        
-        if ($pos !== false && $endPos !== false) {
-            $cssContent = substr_replace($cssContent, $snowEffectCSS, $endPos + 1, 0);
-        }
-    } else {
-        $cssContent .= "#snow-container { display: none; }\n";
-    }
-
-    $filePath = $_SERVER['DOCUMENT_ROOT'] . '/nekobox/assets/theme/transparent.css';
+    $filePath = $_SERVER['DOCUMENT_ROOT'] . '/nekobox/assets/theme/' . $themeFileName;
     file_put_contents($filePath, $cssContent);
     echo "<script>
-            alert('自定义主题已更新，名称为 transparent.css ！');
+            alert('自定义主题已更新，名称为 $themeName.css ！');
             window.location.href = 'settings.php';
           </script>";
 } else {
