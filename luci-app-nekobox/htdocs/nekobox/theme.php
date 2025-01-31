@@ -28,9 +28,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $checkColor = $_POST['checkColor'] ?? '#0eaf3e';
     $labelColor = $_POST['labelColor'] ?? '#0eaf3e';
     $lineColor = $_POST['lineColor'] ?? '#f515f9';
+    $disabledColor = $_POST['disabledColor'] ?? '#23407e';
+    $radiusColor = $_POST['radiusColor'] ?? '#14b863';
+    $ipColor = $_POST['ipColor'] ?? '#09B63F';
+    $ipipColor = $_POST['ipipColor'] ?? '#ff69b4';
+    $detailColor = $_POST['detailColor'] ?? '#FFFFFF';
     $themeName = isset($_POST['themeName']) ? $_POST['themeName'] : 'transparent';   
 
-    $themeName = preg_replace('/[\p{Han}]/u', '', $themeName);
+    $themeName = preg_replace('/[^a-zA-Z0-9_\-一-龯]/u', '', $themeName);
     if (empty($themeName)) {
         $themeName = 'transparent'; 
     }
@@ -73,6 +78,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       --bs-check-bg: $checkColor;
       --bs-label-bg: $labelColor;
       --bs-line-bg: $lineColor;
+      --bs-disabled-bg: $disabledColor;
+      --bs-radius-bg: $radiusColor;
+      --bs-ip-bg: $ipColor;
+      --bs-ipip-bg: $ipipColor;
+      --bs-detail-bg: $detailColor;
 
       --bs-primary-border-subtle: $primaryBorderSubtle; 
       --bs-tertiary: $tertiaryColor; 
@@ -128,8 +138,37 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         font-weight: bold; 
     }
 
+    input.form-control:disabled {
+      background-color: var(--bs-disabled-bg) !important; 
+
+    }
+
     #lineColumnDisplay, #charCountDisplay {
         color: var(--bs-line-bg) !important; 
+    }
+
+    #ip-address {
+        color: var(--bs-ip-bg) !important;  
+    }
+
+    #ipip {
+        color: var(--bs-ipip-bg) !important;  
+    }
+
+    #ipDetailModal .detail-value {
+        color: var(--bs-detail-bg) !important;  
+    }
+
+    #ipDetailModal .detail-label {
+        color: var(--bs-detail-bg) !important; 
+    }
+
+    #ipDetailModal .modal-title:not([class]) {
+        color: var(--bs-heading-5) !important;
+    }
+
+    #ipDetailModal h5:not([class]) {
+        color: var(--bs-heading-5) !important;
     }
 
     .form-label {
@@ -185,14 +224,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     .form-select {
         background-color: var(--bs-form-select);
-        color: var(--bs-controlr-bg) !important;            
+        color: var(--bs-radius-bg) !important;            
         border: 1px solid gray;    
         border-radius: 5px;       
     }
 
     .form-select option {
         background-color: var(--bs-form-select);    
-        color: var(--bs-controlr-bg) !important;           
+        color: var(--bs-radius-bg) !important;           
     }
 
     .form-control {
