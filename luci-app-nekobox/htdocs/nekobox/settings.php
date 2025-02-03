@@ -887,28 +887,26 @@ $razordVersion = getRazordVersion();
       <div class="modal-header">
         <h5 class="modal-title" id="filesModalLabel">上传并管理背景图片/视频</h5>
         <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-      </div>
-      
+      </div>    
       <div class="modal-body">
         <div class="mb-4">
           <h2 class="mb-3">上传背景图片/视频</h2>
           <form method="POST" action="download.php" enctype="multipart/form-data">
-            <input type="file" class="form-control mb-3" name="imageFile" id="imageFile">
-            <button type="submit" class="btn btn-success" id="submitBtn" title="PHP上传文件会有大小限制，如遇上传失败可以手动上传文件到 /nekobox/assets/Pictures 目录">上传图片/视频</button>
+            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#uploadModal"><i class="fas fa-cloud-upload-alt"></i> 上传图片/视频</button>
           </form>
         </div>
-
-<h2 class="mb-3">上传的图片/视频文件</h2>
-<table class="table table-bordered text-center">
-    <thead>
-        <tr>
-            <th>文件名</th>
-            <th>文件大小</th>
-            <th>预览</th>
-            <th>操作</th>
-        </tr>
-    </thead>
-    <tbody>
+          <h2 class="mb-3">上传的图片/视频文件</h2>
+          <table class="table table-bordered text-center">
+              <thead>
+                  <tr>
+                      <th style="width: 25%;">文件名</th>
+                      <th style="width: 10%;">文件大小</th>
+                      <th style="width: 10%;">文件类型</th>
+                      <th style="width: 30%;">预览</th>
+                      <th style="width: 25%;">操作</th>
+                  </tr>
+              </thead>
+              <tbody>
         <?php
         function isImage($file) {
             $imageExtensions = ['jpg', 'jpeg', 'png', 'gif', 'bmp', 'webp'];
@@ -922,6 +920,16 @@ $razordVersion = getRazordVersion();
             return in_array($fileExtension, $videoExtensions);
         }
 
+        function getFileNameWithoutPrefix($file) {
+            $fileBaseName = pathinfo($file, PATHINFO_FILENAME);
+            $hyphenPos = strpos($fileBaseName, '-');
+            if ($hyphenPos !== false) {
+                return substr($fileBaseName, $hyphenPos + 1) . '.' . pathinfo($file, PATHINFO_EXTENSION);
+            } else {
+                return $file;
+            }
+        }
+
         $picturesDir = $_SERVER['DOCUMENT_ROOT'] . '/nekobox/assets/Pictures/';
         if (is_dir($picturesDir)) {
             $files = array_diff(scandir($picturesDir), array('..', '.'));
@@ -930,24 +938,32 @@ $razordVersion = getRazordVersion();
                 if (is_file($filePath)) {
                     $fileSize = filesize($filePath);
                     $fileUrl = '/nekobox/assets/Pictures/' . $file;
+                    $fileNameWithoutPrefix = getFileNameWithoutPrefix($file); 
+
+                    if (isImage($file)) {
+                      $fileType = "图片";
+                    } elseif (isVideo($file)) {
+                      $fileType = "视频";
+                    } else {
+                      $fileType = "未知类型";
+                    }
+
                     echo "<tr>
-                            <td class='align-middle'>$file</td>
-                            <td class='align-middle'>" . formatFileSize($fileSize) . "</td>
-                            <td class='align-middle'>"; 
+                            <td class='align-middle' data-label='文件名'>$fileNameWithoutPrefix</td>
+                            <td class='align-middle' data-label='文件大小'>" . formatFileSize($fileSize) . "</td>
+                            <td class='align-middle' data-label='文件类型'>$fileType</td>
+                            <td class='align-middle' data-label='预览'>";
                     if (isVideo($file)) {
-                        $fileType = strtolower(pathinfo($file, PATHINFO_EXTENSION));
-                        echo "<video width='100' controls>
-                                <source src='$fileUrl' type='video/$fileType'>
-                                Your browser does not support the video tag.
-                              </video>";
+                        echo "<video width='200' controls><source src='$fileUrl' type='video/mp4'>Your browser does not support the video tag.</video>";
                     } elseif (isImage($file)) {
-                        echo "<img src='$fileUrl' alt='$file' style='width: 100px; height: auto;'>";
+                        echo "<img src='$fileUrl' alt='$file' style='width: 200px; height: auto;'>";
                     } else {
                         echo "未知文件类型";
                     }
                     
                     echo "</td>
-                    <td class='align-middle'>
+                    <td class='align-middle' data-label='操作'>
+                      <div class='btn-container'>
                         <a href='?delete=" . htmlspecialchars($file, ENT_QUOTES) . "' class='btn btn-danger' onclick='return confirm(\"确定要删除吗?\")'>删除</a>";
                     
                     if (isImage($file)) {
@@ -973,10 +989,135 @@ $razordVersion = getRazordVersion();
   </div>
 </div>
 
+<div class="modal fade" id="uploadModal" tabindex="-1" aria-labelledby="uploadModalLabel" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="uploadModalLabel"><i class="fas fa-cloud-upload-alt"></i> 上传文件</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body text-center">
+                <h2 class="mb-3">上传图片/视频</h2>
+                <form method="POST" action="download.php" enctype="multipart/form-data">
+                    <div id="dropArea" class="mb-3">
+                        <i id="uploadIcon" class="fas fa-cloud-upload-alt"></i>
+                        <p>拖拽文件到此区域，或点击图标选择文件。</p>
+                        <p>PHP上传文件会有大小限制，如遇上传失败可以手动上传文件到 /nekobox/assets/Pictures 目录</p>
+                    </div>
+                    <input type="file" class="form-control mb-3" name="imageFile[]" id="imageFile" multiple style="display: none;">                   
+                    <button type="submit" class="btn btn-success mt-3" id="submitBtnModal">
+                        上传图片/视频
+                    </button>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                <button type="button" class="btn btn-warning" id="updatePhpConfig">更新 PHP 上传限制</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.getElementById("updatePhpConfig").addEventListener("click", function() {
+    if (confirm("确定要修改 PHP 上传限制吗？")) {
+        fetch("update_php_config.php", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" }
+        })
+        .then(response => response.json())
+        .then(data => alert(data.message))
+        .catch(error => alert("请求失败：" + error.message));
+    }
+});
+</script>
+
+<script>
+    document.getElementById('uploadIcon').addEventListener('click', function() {
+        document.getElementById('imageFile').click(); 
+    });
+
+    document.getElementById('imageFile').addEventListener('change', function() {
+        if (this.files.length > 0) {
+            document.getElementById('submitBtnModal').style.display = 'inline-block';
+        } else {
+            document.getElementById('submitBtnModal').style.display = 'none';
+        }
+    });
+
+    const dropArea = document.getElementById('dropArea');
+    dropArea.addEventListener('dragover', function(event) {
+        event.preventDefault(); 
+        dropArea.classList.add('dragging'); 
+    });
+
+    dropArea.addEventListener('dragleave', function() {
+        dropArea.classList.remove('dragging'); 
+    });
+
+    dropArea.addEventListener('drop', function(event) {
+        event.preventDefault();
+        dropArea.classList.remove('dragging'); 
+
+        const files = event.dataTransfer.files;
+        document.getElementById('imageFile').files = files; 
+
+        if (files.length > 0) {
+            document.getElementById('submitBtnModal').style.display = 'inline-block'; 
+        }
+    });
+</script>
+
+<script>
+    const fileInput = document.getElementById('imageFile');
+    const dragDropArea = document.getElementById('dragDropArea');
+    const submitBtn = document.getElementById('submitBtn');
+
+    dragDropArea.addEventListener('dragover', function(e) {
+        e.preventDefault();
+        dragDropArea.classList.add('drag-over');
+    });
+
+    dragDropArea.addEventListener('dragleave', function(e) {
+        e.preventDefault();
+        dragDropArea.classList.remove('drag-over');
+    });
+
+    dragDropArea.addEventListener('drop', function(e) {
+        e.preventDefault();
+        dragDropArea.classList.remove('drag-over');
+        
+        const files = e.dataTransfer.files;
+        if (files.length > 0) {
+            fileInput.files = files;  
+        }
+    });
+
+    fileInput.addEventListener('change', function(e) {
+        const files = e.target.files;
+        if (files.length > 0) {
+            submitBtn.disabled = false;
+        } else {
+            submitBtn.disabled = true;
+        }
+    });
+
+    function updateDragDropText() {
+        if (fileInput.files.length > 0) {
+            dragDropArea.querySelector('p').textContent = `${fileInput.files.length} 个文件已选择`;
+        } else {
+            dragDropArea.querySelector('p').textContent = '拖动文件到此区域，或点击选择文件';
+        }
+    }
+</script>
+
 <?php
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $uploadedFilePath = '';
-    $allowedTypes = ['jpg', 'jpeg', 'png', 'mp4', 'avi', 'mkv']; 
+    $allowedTypes = [
+        'image/jpeg', 'image/png', 'image/gif', 'image/bmp', 'image/webp',
+        'video/mp4', 'video/avi', 'video/mkv', 'video/mov', 'video/wmv', 'video/3gp'
+    ];
 
     if (isset($_FILES['imageFile']) && $_FILES['imageFile']['error'] === UPLOAD_ERR_OK) {
         $targetDir = $_SERVER['DOCUMENT_ROOT'] . '/nekobox/assets/Pictures/';
@@ -1020,54 +1161,87 @@ function formatFileSize($size) {
     }
 }
 ?>
+
 <script>
 function setBackground(filename, type, action = 'set') {
+    const bodyData = 'filename=' + encodeURIComponent(filename) + '&type=' + type;
+
     if (action === 'set') {
-        if (type === 'image') {
-            if (confirm("确定要将此图片设置为背景吗？")) {
-                fetch('/nekobox/set_background.php', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                    body: 'action=set&filename=' + encodeURIComponent(filename) + '&type=image'
-                })
-                .then(response => response.text())
-                .then(data => {
-                    alert(data);  
-                    location.reload();  
-                })
-                .catch(error => console.error('Error:', error));
-            }
-        } else if (type === 'video') {
-            if (confirm("确定要将此视频设置为背景吗？")) {
-                fetch('/nekobox/set_background.php', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                    body: 'action=set&filename=' + encodeURIComponent(filename) + '&type=video'
-                })
-                .then(response => response.text())
-                .then(data => {
-                    alert(data);  
-                    location.reload(); 
-                })
-                .catch(error => console.error('Error:', error));
-            }
-        }
-    } else if (action === 'remove') {
-        if (confirm("确定要删除背景吗？")) {
-            fetch('/nekobox/set_background.php', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                body: 'action=remove'
-            })
-            .then(response => response.text())
-            .then(data => {
-                alert(data);  
-                location.reload(); 
-            })
-            .catch(error => console.error('Error:', error));
-        }
+        fetch('/nekobox/set_background.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: 'action=set&' + bodyData
+        })
+        .then(response => response.text())
+        .then(data => {
+            sessionStorage.setItem('notificationMessage', data);
+            sessionStorage.setItem('notificationType', 'success');
+            location.reload(); 
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            sessionStorage.setItem('notificationMessage', "操作失败，请稍后再试");
+            sessionStorage.setItem('notificationType', 'error');
+            location.reload();  
+        });
+    }
+
+    else if (action === 'remove') {
+        fetch('/nekobox/set_background.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: 'action=remove'
+        })
+        .then(response => response.text())
+        .then(data => {
+            sessionStorage.setItem('notificationMessage', data);
+            sessionStorage.setItem('notificationType', 'success');
+            location.reload(); 
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            sessionStorage.setItem('notificationMessage', "删除失败，请稍后再试");
+            sessionStorage.setItem('notificationType', 'error');
+            location.reload();  
+        });
     }
 }
+
+function showNotification(message, type = 'success') {
+    var notification = document.createElement('div');
+    notification.style.position = 'fixed';
+    notification.style.top = '10px';
+    notification.style.left = '30px'; 
+    notification.style.padding = '10px';
+    notification.style.borderRadius = '5px';
+    notification.style.zIndex = '9999';
+    notification.style.color = '#fff'; 
+    notification.innerText = message;
+
+    if (type === 'success') {
+        notification.style.backgroundColor = '#4CAF50'; 
+    } else if (type === 'error') {
+        notification.style.backgroundColor = '#F44336'; 
+    }
+
+    document.body.appendChild(notification);
+
+    setTimeout(function() {
+        notification.style.display = 'none';
+    }, 5000); 
+}
+
+window.addEventListener('load', function() {
+    var message = sessionStorage.getItem('notificationMessage');
+    var type = sessionStorage.getItem('notificationType');
+
+    if (message) {
+        showNotification(message, type); 
+        sessionStorage.removeItem('notificationMessage');
+        sessionStorage.removeItem('notificationType');
+    }
+});
+
 </script>
 
 <script>

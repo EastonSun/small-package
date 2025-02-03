@@ -480,7 +480,128 @@ $lang = $_GET['lang'] ?? 'en';
         fill: none !important;
     }
 
+    #dropArea {
+        border: 2px dashed #007bff;
+        padding: 20px;
+        border-radius: 10px;
+        text-align: center;
+        background-color: #f8f9fa;
+    }
+
+    #dropArea.dragging {
+        background-color: #e9ecef;
+    }
+
+    #dropArea p {
+        color: #ff69b4; 
+    }
+
+    #uploadIcon {
+        font-size: 50px;
+        color: #007bff;
+        cursor: pointer;
+        margin-bottom: 20px;
+        transition: color 0.3s;
+    }
+
+    #uploadIcon:hover {
+        color: #0056b3; 
+    }
+
+    #submitBtnModal {
+        display: none;
+        padding: 10px 20px;
+        font-size: 16px;
+        border: none;
+        background-color: #28a745;
+        color: white;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: background-color 0.3s;
+    }
+
+    #submitBtnModal:hover {
+        background-color: #218838;
+    }
+
+@media (max-width: 768px) {
+    .d-flex.justify-content-between.gap-2 {
+        width: 100%;
+        display: flex;
+        justify-content: space-between; 
+        gap: 5px; 
+        padding-left: 0.7em; 
+    }
+
+    .d-flex.justify-content-between.gap-2 .btn {
+        flex: 1; 
+        min-width: 0; 
+        text-align: center;
+    }
+}
+
+@media (max-width: 1440px) {
+    .modal-dialog {
+        max-width: 100% !important; 
+        margin: 30px auto; 
+    }
+
+    .table thead {
+        display: none;
+    }
+
+    .table tbody,
+    .table tr,
+    .table td {
+        display: block;
+        width: 100%;
+    }
+
+    .table tr {
+        margin-bottom: 10px;
+        border: 1px solid #dee2e6;
+        border-radius: 5px;
+        padding: 10px;
+        background: #f8f9fa;
+    }
+
+    .table td::before {
+        content: attr(data-label);
+        font-weight: bold;
+        display: block;
+        margin-bottom: 5px;
+    }
+
+    .table td img,
+    .table td video {
+        display: block;
+        margin: 0 auto;
+    }
+
+    .table td .btn-container {
+        display: flex; 
+        justify-content: space-between; 
+        gap: 10px; 
+    }
+
+    .table td .btn {
+        flex: 1; 
+        text-align: center; 
+        padding: 10px;
+        font-size: 14px;
+        min-width: 0; 
+    }
+}
+
+@media (max-width: 767px) {
+    .control-toggle {
+        display: none;
+    }
+}
 </style>
+<link href="./assets/bootstrap/video-js.css" rel="stylesheet" />
+<script src="./assets/bootstrap/video.js"></script>
+<link rel="stylesheet" href="./assets/bootstrap/all.min.css">
 <link href="./assets/bootstrap/bootstrap-icons.css" rel="stylesheet">
 <script src="./assets/neko/js/jquery.min.js"></script>
 <link rel="stylesheet" href="./assets/bootstrap/leaflet.css" />
@@ -1154,19 +1275,39 @@ setInterval(IP.getIpipnetIP, 180000);
 <script>
     document.addEventListener("DOMContentLoaded", function () {
         var video = document.getElementById('background-video');
-
+        
         var savedMuteState = localStorage.getItem("videoMuted");
         if (savedMuteState !== null) {
             video.muted = savedMuteState === "true";
         }
 
+        var savedObjectFit = localStorage.getItem("videoObjectFit");
+        if (savedObjectFit) {
+            video.style.objectFit = savedObjectFit;
+        } else {
+            video.style.objectFit = "cover"; 
+        }
+
         updateButtonStates();
+    });
+
+    var longPressTimer;
+    var touchStartTime = 0;
+
+    document.addEventListener('touchstart', function (event) {
+        var touch = event.touches[0];
+        touchStartTime = new Date().getTime();
+    
+        if (touch.clientY < window.innerHeight / 2) {
+            longPressTimer = setTimeout(function () {
+                togglePopup();
+            }, 1000); 
+        }
     });
 
     function togglePopup() {
         var popup = document.getElementById('popup');
         popup.style.display = (popup.style.display === "block") ? "none" : "block";
-
         updateButtonStates();
     }
 
@@ -1186,13 +1327,50 @@ setInterval(IP.getIpipnetIP, 180000);
         updateButtonStates();
     }
 
+    function toggleObjectFit() {
+        var video = document.getElementById('background-video');
+        var objectFitBtn = document.getElementById('object-fit-btn');
+
+        switch (video.style.objectFit) {
+            case "contain":
+                video.style.objectFit = "cover";
+                objectFitBtn.textContent = "🔲 正常显示";
+                localStorage.setItem("videoObjectFit", "cover");
+                break;
+            case "cover":
+                video.style.objectFit = "fill";
+                objectFitBtn.textContent = "🖼️ 填充";
+                localStorage.setItem("videoObjectFit", "fill");
+                break;
+            case "fill":
+                video.style.objectFit = "none";
+                objectFitBtn.textContent = "🔲 不缩放";
+                localStorage.setItem("videoObjectFit", "none");
+                break;
+            case "none":
+                video.style.objectFit = "scale-down";
+                objectFitBtn.textContent = "🖼️ 缩小";
+                localStorage.setItem("videoObjectFit", "scale-down");
+                break;
+            case "scale-down":
+                video.style.objectFit = "contain";
+                objectFitBtn.textContent = "🖼️ 铺满全屏";
+                localStorage.setItem("videoObjectFit", "contain");
+                break;
+            default:
+                video.style.objectFit = "cover"; 
+                objectFitBtn.textContent = "🔲 正常显示";
+                localStorage.setItem("videoObjectFit", "cover");
+                break;
+        }
+    }
+
     function updateButtonStates() {
         var video = document.getElementById('background-video');
         var audioBtn = document.getElementById('audio-btn');
         var fullscreenBtn = document.getElementById('fullscreen-btn');
 
         audioBtn.textContent = video.muted ? "🔇 静音" : "🔊 取消静音";
-
         fullscreenBtn.textContent = document.fullscreenElement ? "📴 退出全屏" : "⛶ 进入全屏";
     }
 
@@ -1203,7 +1381,7 @@ setInterval(IP.getIpipnetIP, 180000);
     });
 
     document.addEventListener("fullscreenchange", updateButtonStates);
-</script>  
+</script>
 
 <script>
 document.addEventListener('keydown', function(event) {
@@ -1638,6 +1816,7 @@ window.addEventListener('load', function() {
                     <li><strong>Ctrl + Shift + C键:</strong> 清空缓存数据</li>
                     <li><strong>Ctrl + Shift + V键:</strong> 定制播放列表</li>
                     <li><strong>Ctrl + Shift + X键:</strong> 设置城市</li>
+                    <li><strong>长按屏幕顶部</strong> 设置音频（视频模式下有效）</li>
                 </ul>
             </div>
             <div class="modal-footer">
@@ -2399,6 +2578,22 @@ function speakWeather(weather) {
         feather.replace();
     });
 </script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
